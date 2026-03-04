@@ -4,6 +4,7 @@ export default defineConfig({
   title: 'NanoBoot Framework',
   description: 'A Spring Boot-like micro-framework for Java development',
   base: '/NanoBoot/',
+  outDir: './dist',
   locales: {
     root: {
       label: 'English',

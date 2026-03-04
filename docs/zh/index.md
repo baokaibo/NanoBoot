@@ -9,6 +9,9 @@ hero:
   name: NanoBoot
   text: Java 微框架
   tagline: 轻量级的 Spring Boot 替代方案，具有依赖注入、Web 支持等功能
+  image:
+    src: /docs/image/C语言类型判断 (2)(2)(1).png
+    alt: C语言类型判断
   actions:
     - theme: brand
       text: 开始使用

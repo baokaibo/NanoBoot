@@ -1,0 +1,32 @@
+---
+layout: home
+
+title: NanoBoot Framework
+titleTemplate: A Spring Boot-like micro-framework for Java
+
+hero:
+  name: NanoBoot
+  text: Java Micro-Framework
+  tagline: A lightweight Spring Boot alternative with dependency injection, web support, and more
+  actions:
+    - theme: brand
+      text: Get Started
+      link: /guide/getting-started
+    - theme: alt
+      text: View on GitHub
+      link: https://github.com/nanoboot/framework
+
+features:
+  - title: ⚡ Lightweight
+    details: Minimal overhead compared to Spring Boot with similar functionality
+  - title: 🏗️ Modular Architecture
+    details: Pick and choose only the components you need for your application
+  - title: 🔧 Annotation Driven
+    details: Familiar Spring-style annotations for development
+  - title: 🚀 Quick Setup
+    details: Command line tool to generate complete projects instantly
+  - title: 🌐 Full Stack Ready
+    details: Web, data access, WebSocket, and more in one framework
+  - title: 📦 Standard Compliant
+    details: Follows familiar Java development patterns and conventions
+---

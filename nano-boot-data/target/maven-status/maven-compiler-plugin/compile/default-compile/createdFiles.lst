@@ -1,0 +1,5 @@
+org\nanoboot\data\config\DataConfiguration.class
+org\nanoboot\data\redis\RedisClient.class
+org\nanoboot\data\mybatis\MyBatisConfiguration$DataSourceAdapter.class
+org\nanoboot\data\mybatis\MyBatisConfiguration.class
+org\nanoboot\data\datasource\MySQLDataSource.class

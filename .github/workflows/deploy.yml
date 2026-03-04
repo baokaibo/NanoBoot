@@ -17,23 +17,19 @@ jobs:
     steps:
       - uses: actions/checkout@v4
 
-      - uses: pnpm/action-setup@v4
-        with:
-          version: 9
-
       - uses: actions/setup-node@v4
         with:
           node-version: 20
-          cache: 'pnpm'
-          cache-dependency-path: docs/pnpm-lock.yaml
+          cache: 'npm'
+          cache-dependency-path: docs/package-lock.json
 
       - name: Install dependencies
         working-directory: docs
-        run: pnpm install --frozen-lockfile
+        run: npm ci
 
       - name: Build
         working-directory: docs
-        run: pnpm docs:build
+        run: npm run docs:build
 
       - name: Setup Pages
         uses: actions/configure-pages@v4

@@ -29,6 +29,8 @@ jobs:
 
       - name: Build
         working-directory: docs
+        env:
+          GITHUB_PAGES_BASE_URL: /
         run: npm run docs:build
 
       - name: Setup Pages

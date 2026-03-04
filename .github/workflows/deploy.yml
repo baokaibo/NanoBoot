@@ -30,7 +30,7 @@ jobs:
       - name: Build
         working-directory: docs
         env:
-          GITHUB_PAGES_BASE_URL: /
+          GITHUB_PAGES_BASE_URL: /NanoBoot/
         run: npm run docs:build
 
       - name: Setup Pages

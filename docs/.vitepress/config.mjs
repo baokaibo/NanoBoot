@@ -3,7 +3,7 @@ import { defineConfig } from 'vitepress'
 export default defineConfig({
   title: 'NanoBoot Framework',
   description: 'A Spring Boot-like micro-framework for Java development',
-  base: '/',
+  base: '/NanoBoot/',
   locales: {
     root: {
       label: 'English',
@@ -134,6 +134,6 @@ export default defineConfig({
   },
   head: [
     ['meta', { name: 'theme-color', content: '#3eaf7c' }],
-    ['link', { rel: 'icon', href: '/favicon.ico' }]
+    ['link', { rel: 'icon', href: '/NanoBoot/favicon.ico' }]
   ]
 })

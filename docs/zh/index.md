@@ -15,7 +15,7 @@ hero:
       link: /zh/guide/getting-started
     - theme: alt
       text: 查看 GitHub
-      link: https://github.com/nanoboot/framework
+      link: https://github.com/baokaibo/NanoBoot
 
 features:
   - title: ⚡ 轻量级

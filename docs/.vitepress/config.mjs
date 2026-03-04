@@ -61,8 +61,7 @@ export default defineConfig({
               text: 'API Reference',
               items: [
                 { text: 'Annotations', link: '/api/annotations' },
-                { text: 'Configuration', link: '/api/configuration' },
-                { text: 'Utilities', link: '/api/utilities' }
+                { text: 'Configuration', link: '/api/configuration' }
               ]
             }
           ]
@@ -125,8 +124,7 @@ export default defineConfig({
               text: 'API 参考',
               items: [
                 { text: '注解', link: '/zh/api/annotations' },
-                { text: '配置', link: '/zh/api/configuration' },
-                { text: '工具类', link: '/zh/api/utilities' }
+                { text: '配置', link: '/zh/api/configuration' }
               ]
             }
           ]

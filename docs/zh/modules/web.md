@@ -50,9 +50,9 @@ public class UserController {
 
 将请求参数绑定到方法参数：
 
-```javasearch")
+```java
 public String
-@GetMapping("/ searchUsers(
+@GetMapping("/searchUsers(
     @RequestParam(defaultValue = "0") int page,
     @RequestParam(defaultValue = "10") int size,
     @RequestParam(required = false) String q) {

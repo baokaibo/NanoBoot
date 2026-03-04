@@ -14,7 +14,7 @@ hero:
       link: /guide/getting-started
     - theme: alt
       text: View on GitHub
-      link: https://github.com/nanoboot/framework
+      link: https://github.com/baokaibo/NanoBoot
 
 features:
   - title: ⚡ Lightweight

@@ -1,5 +1,7 @@
 # NanoBoot - 轻量级Java框架
 
+![NanoBoot](docs/docs/image/NanoBoot.png)
+
 NanoBoot是一个轻量级的Java框架，模仿Spring Boot的设计理念，提供IOC容器、注解驱动、自动包扫描、自动装配和内嵌HTTP服务器等功能。
 
 ## 特性

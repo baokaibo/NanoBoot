@@ -1,8 +1,5 @@
 org\nanoboot\example\websocket\ChatWebSocketEndpoint.class
 org\nanoboot\example\service\UserService.class
-org\nanoboot\starter\NanoBootApplicationRunner.class
 org\nanoboot\example\controller\UserController.class
-org\nanoboot\example\NanoBootExampleApp.class
 org\nanoboot\example\simple\SimpleController.class
-org\nanoboot\example\SimpleNanoBootExampleApp.class
 org\nanoboot\example\service\DataService.class

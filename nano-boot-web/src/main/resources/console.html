@@ -1,0 +1,1436 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>nanoboot</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Fira+Code:wght@400;500;600;700&family=Fira+Sans:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --bg-primary: #0F172A;
+            --bg-secondary: #1E293B;
+            --bg-tertiary: #334155;
+            --text-primary: #F8FAFC;
+            --text-secondary: #94A3B8;
+            --text-muted: #64748B;
+            --accent-green: #22C55E;
+            --accent-blue: #3B82F6;
+            --accent-purple: #8B5CF6;
+            --accent-pink: #EC4899;
+            --accent-cyan: #06B6D4;
+            --border-color: #334155;
+            --success: #22C55E;
+            --error: #EF4444;
+            --warning: #F59E0B;
+        }
+        
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: 'Fira Sans', system-ui, -apple-system, sans-serif;
+            background: var(--bg-primary);
+            color: var(--text-primary);
+            min-height: 100vh;
+            padding: 24px;
+            line-height: 1.6;
+        }
+        
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+        }
+        
+        /* Header */
+        .header {
+            background: var(--bg-secondary);
+            border: 1px solid var(--border-color);
+            border-radius: 16px;
+            padding: 32px;
+            margin-bottom: 24px;
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .header::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 4px;
+            background: linear-gradient(90deg, var(--accent-green), var(--accent-blue), var(--accent-purple));
+        }
+        
+        .header-top {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 24px;
+        }
+        
+        .header h1 {
+            font-family: 'Fira Code', monospace;
+            font-size: 2.5rem;
+            font-weight: 700;
+            display: flex;
+            align-items: center;
+            gap: 16px;
+            color: var(--text-primary);
+        }
+        
+        .header h1 i {
+            color: var(--accent-green);
+            font-size: 1.8em;
+        }
+        
+        .header-badge {
+            font-size: 0.75rem;
+            padding: 4px 12px;
+            background: rgba(34, 197, 94, 0.15);
+            color: var(--accent-green);
+            border: 1px solid rgba(34, 197, 94, 0.3);
+            border-radius: 20px;
+            font-family: 'Fira Code', monospace;
+        }
+        
+        .lang-btn {
+            padding: 10px 20px;
+            border: 1px solid var(--border-color);
+            background: var(--bg-tertiary);
+            color: var(--text-primary);
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 0.9rem;
+            font-family: 'Fira Sans', sans-serif;
+            transition: all 0.2s ease;
+        }
+        
+        .lang-btn:hover {
+            background: var(--accent-blue);
+            border-color: var(--accent-blue);
+        }
+        
+        /* Stats Grid */
+        .stats {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 16px;
+        }
+        
+        .stat-card {
+            background: var(--bg-tertiary);
+            border: 1px solid var(--border-color);
+            border-radius: 12px;
+            padding: 20px 24px;
+            display: flex;
+            align-items: center;
+            gap: 16px;
+            transition: all 0.2s ease;
+        }
+        
+        .stat-card:hover {
+            border-color: var(--accent-blue);
+            transform: translateY(-2px);
+        }
+        
+        .stat-card i {
+            font-size: 2rem;
+            width: 48px;
+            height: 48px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: 12px;
+            background: rgba(59, 130, 246, 0.15);
+            color: var(--accent-blue);
+        }
+        
+        .stat-card:nth-child(2) i {
+            background: rgba(139, 92, 246, 0.15);
+            color: var(--accent-purple);
+        }
+        
+        .stat-card:nth-child(3) i {
+            background: rgba(34, 197, 94, 0.15);
+            color: var(--accent-green);
+        }
+        
+        .stat-card:nth-child(4) i {
+            background: rgba(6, 182, 212, 0.15);
+            color: var(--accent-cyan);
+        }
+        
+        .stat-info .number {
+            font-family: 'Fira Code', monospace;
+            font-size: 1.75rem;
+            font-weight: 700;
+            color: var(--text-primary);
+            line-height: 1.2;
+        }
+        
+        .stat-info .label {
+            font-size: 0.875rem;
+            color: var(--text-secondary);
+        }
+        
+        /* Tabs */
+        .tabs {
+            display: flex;
+            gap: 4px;
+            background: var(--bg-secondary);
+            padding: 6px;
+            border-radius: 12px;
+            margin-bottom: 24px;
+            overflow-x: auto;
+            border: 1px solid var(--border-color);
+        }
+        
+        .tab-btn {
+            padding: 14px 24px;
+            border: none;
+            background: transparent;
+            color: var(--text-secondary);
+            font-size: 0.95rem;
+            font-weight: 500;
+            cursor: pointer;
+            border-radius: 8px;
+            transition: all 0.2s ease;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            white-space: nowrap;
+            font-family: 'Fira Sans', sans-serif;
+        }
+        
+        .tab-btn:hover {
+            color: var(--text-primary);
+            background: var(--bg-tertiary);
+        }
+        
+        .tab-btn.active {
+            background: var(--accent-blue);
+            color: white;
+            box-shadow: 0 4px 12px rgba(59, 130, 246, 0.3);
+        }
+        
+        .tab-btn i {
+            font-size: 1rem;
+        }
+        
+        /* Tab Content */
+        .tab-content {
+            background: var(--bg-secondary);
+            border: 1px solid var(--border-color);
+            border-radius: 16px;
+            padding: 32px;
+            margin-top: 24px;
+            display: none;
+            animation: fadeIn 0.3s ease;
+        }
+        
+        .tab-content.active {
+            display: block;
+        }
+        
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        
+        .tab-content h2 {
+            font-size: 1.5rem;
+            font-weight: 600;
+            margin-bottom: 24px;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            color: var(--text-primary);
+        }
+        
+        .tab-content h2 i {
+            color: var(--accent-blue);
+        }
+        
+        /* Tables */
+        table {
+            width: 100%;
+            border-collapse: separate;
+            border-spacing: 0;
+            background: var(--bg-primary);
+            border-radius: 12px;
+            overflow: hidden;
+            border: 1px solid var(--border-color);
+        }
+        
+        th, td {
+            padding: 16px 20px;
+            text-align: left;
+            border-bottom: 1px solid var(--border-color);
+        }
+        
+        th {
+            background: var(--bg-tertiary);
+            color: var(--text-secondary);
+            font-weight: 600;
+            font-size: 0.875rem;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+        }
+        
+        tr:last-child td {
+            border-bottom: none;
+        }
+        
+        tr:hover td {
+            background: rgba(59, 130, 246, 0.05);
+        }
+        
+        .bean-name {
+            font-family: 'Fira Code', monospace;
+            font-weight: 600;
+            color: var(--accent-green);
+        }
+        
+        .method-badge {
+            display: inline-block;
+            padding: 4px 12px;
+            border-radius: 6px;
+            font-size: 0.8rem;
+            font-weight: 600;
+            font-family: 'Fira Code', monospace;
+            color: white;
+        }
+        
+        .method-badge.GET { background: var(--success); }
+        .method-badge.POST { background: var(--accent-blue); }
+        .method-badge.PUT { background: var(--warning); }
+        .method-badge.DELETE { background: var(--error); }
+        .method-badge.PATCH { background: var(--accent-purple); }
+        
+        /* API Tester */
+        .api-tester {
+            background: var(--bg-primary);
+            border: 1px solid var(--border-color);
+            padding: 24px;
+            border-radius: 12px;
+            margin-bottom: 24px;
+        }
+        
+        .api-tester h3 {
+            margin-bottom: 20px;
+            color: var(--text-primary);
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            font-size: 1.1rem;
+        }
+        
+        .form-row {
+            display: flex;
+            gap: 12px;
+            margin-bottom: 16px;
+            flex-wrap: wrap;
+        }
+        
+        select, input, textarea {
+            flex: 1;
+            min-width: 200px;
+            padding: 14px 18px;
+            background: var(--bg-secondary);
+            border: 2px solid var(--border-color);
+            border-radius: 8px;
+            font-size: 0.95rem;
+            color: var(--text-primary);
+            transition: border-color 0.2s ease;
+            font-family: 'Fira Code', monospace;
+        }
+        
+        select:focus, input:focus, textarea:focus {
+            outline: none;
+            border-color: var(--accent-blue);
+        }
+        
+        select {
+            max-width: 150px;
+        }
+        
+        textarea {
+            min-height: 140px;
+            resize: vertical;
+        }
+        
+        .btn {
+            padding: 14px 32px;
+            border: none;
+            border-radius: 8px;
+            font-size: 1rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            display: inline-flex;
+            align-items: center;
+            gap: 10px;
+            font-family: 'Fira Sans', sans-serif;
+        }
+        
+        .btn-primary {
+            background: linear-gradient(135deg, var(--accent-green), #16A34A);
+            color: white;
+        }
+        
+        .btn-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(34, 197, 94, 0.4);
+        }
+        
+        .btn-primary:active {
+            transform: translateY(0);
+        }
+        
+        .response-area {
+            background: #0D1117;
+            color: #E6EDF3;
+            padding: 24px;
+            border-radius: 12px;
+            min-height: 180px;
+            max-height: 500px;
+            overflow: auto;
+            font-family: 'Fira Code', monospace;
+            font-size: 0.9rem;
+            white-space: pre-wrap;
+            margin-top: 20px;
+            border: 1px solid var(--border-color);
+            line-height: 1.5;
+        }
+        
+        /* JSON Syntax Highlighting */
+        .json-key { color: #79C0FF; }
+        .json-string { color: #A5D6FF; }
+        .json-number { color: #79C0FF; }
+        .json-boolean { color: #FF7B72; }
+        .json-null { color: #FF7B72; }
+        .json-bracket { color: #E6EDF3; }
+        
+        .response-header {
+            margin-bottom: 12px;
+            padding-bottom: 12px;
+            border-bottom: 1px solid var(--border-color);
+        }
+        
+        .response-status {
+            font-weight: bold;
+        }
+        
+        .response-status.ok { color: var(--accent-green); }
+        .response-status.error { color: var(--error); }
+        
+        .response-time {
+            color: var(--text-muted);
+            margin-left: 16px;
+        }
+        
+        .response-body {
+            margin-top: 12px;
+        }
+        
+        .status-bar {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 14px 20px;
+            background: var(--bg-tertiary);
+            color: var(--text-secondary);
+            border-radius: 8px;
+            margin-top: 16px;
+            font-size: 0.9rem;
+        }
+        
+        .status-dot {
+            width: 10px;
+            height: 10px;
+            border-radius: 50%;
+            background: var(--accent-green);
+            display: inline-block;
+            margin-right: 10px;
+            animation: pulse 2s infinite;
+        }
+        
+        @keyframes pulse {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.5; }
+        }
+        
+        /* Quick Test */
+        .quick-test {
+            font-size: 1.1rem;
+            font-weight: 600;
+            margin: 24px 0 16px;
+            color: var(--accent-blue);
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        
+        .quick-test-container {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 10px;
+            margin-bottom: 20px;
+        }
+        
+        .quick-btn {
+            background: var(--bg-tertiary);
+            border: 1px solid var(--border-color);
+            color: var(--text-primary);
+            padding: 10px 16px;
+            border-radius: 8px;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            font-size: 0.9rem;
+            transition: all 0.2s ease;
+            font-family: 'Fira Code', monospace;
+        }
+        
+        .quick-btn:hover {
+            border-color: var(--accent-blue);
+            background: rgba(59, 130, 246, 0.1);
+        }
+        
+        .quick-btn .path {
+            color: var(--text-secondary);
+        }
+        
+        /* Graph */
+        .graph-container {
+            background: var(--bg-primary);
+            border-radius: 12px;
+            padding: 24px;
+            min-height: 450px;
+            position: relative;
+            border: 1px solid var(--border-color);
+        }
+        
+        .graph-info {
+            position: absolute;
+            top: 16px;
+            left: 16px;
+            color: var(--text-muted);
+            font-size: 0.875rem;
+            font-family: 'Fira Code', monospace;
+        }
+        
+        .legend {
+            position: absolute;
+            top: 16px;
+            right: 16px;
+            background: var(--bg-tertiary);
+            padding: 12px 16px;
+            border-radius: 8px;
+            color: var(--text-secondary);
+            font-size: 0.85rem;
+            display: flex;
+            gap: 16px;
+        }
+        
+        .legend span {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        
+        .legend-dot {
+            width: 10px;
+            height: 10px;
+            border-radius: 50%;
+            background: var(--accent-blue);
+        }
+        
+        .loading {
+            text-align: center;
+            padding: 60px;
+            color: var(--text-muted);
+        }
+        
+        .loading i {
+            font-size: 2.5rem;
+            animation: spin 1s linear infinite;
+            color: var(--accent-blue);
+        }
+        
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+        
+        /* Dashboard Grid */
+        .dashboard-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 24px;
+        }
+        
+        .dashboard-card {
+            background: var(--bg-primary);
+            border: 1px solid var(--border-color);
+            padding: 28px;
+            border-radius: 12px;
+            transition: all 0.2s ease;
+        }
+        
+        .dashboard-card:hover {
+            border-color: var(--accent-blue);
+            transform: translateY(-2px);
+        }
+        
+        .dashboard-card h3 {
+            font-size: 1.1rem;
+            margin-bottom: 16px;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            color: var(--text-primary);
+        }
+        
+        .dashboard-card h3 i {
+            color: var(--accent-blue);
+        }
+        
+        .dashboard-card .big-number {
+            font-family: 'Fira Code', monospace;
+            font-size: 3rem;
+            font-weight: 700;
+            color: var(--text-primary);
+            margin: 12px 0;
+        }
+        
+        .dashboard-card p {
+            color: var(--text-secondary);
+            font-size: 0.95rem;
+        }
+        
+        /* Server Status Indicator */
+        .server-status {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            margin-top: 16px;
+            padding: 12px 16px;
+            background: rgba(34, 197, 94, 0.1);
+            border-radius: 8px;
+            border: 1px solid rgba(34, 197, 94, 0.2);
+        }
+        
+        .server-status .status-dot {
+            width: 12px;
+            height: 12px;
+            background: var(--accent-green);
+            border-radius: 50%;
+            animation: pulse 2s infinite;
+        }
+        
+        .server-status span {
+            color: var(--accent-green);
+            font-weight: 500;
+            font-family: 'Fira Code', monospace;
+        }
+        
+        /* Responsive */
+        @media (max-width: 768px) {
+            .header h1 { font-size: 1.8rem; }
+            .stats { grid-template-columns: 1fr 1fr; }
+            .stat-card { padding: 16px; }
+            .form-row { flex-direction: column; }
+            select { max-width: 100%; }
+            .tabs { flex-wrap: nowrap; overflow-x: auto; }
+            .tab-btn { padding: 12px 16px; font-size: 0.85rem; }
+        }
+        
+        @media (max-width: 480px) {
+            body { padding: 12px; }
+            .stats { grid-template-columns: 1fr; }
+            .header { padding: 20px; }
+            .tab-content { padding: 20px; }
+        }
+        
+        /* Scrollbar */
+        ::-webkit-scrollbar {
+            width: 8px;
+            height: 8px;
+        }
+        
+        ::-webkit-scrollbar-track {
+            background: var(--bg-primary);
+        }
+        
+        ::-webkit-scrollbar-thumb {
+            background: var(--border-color);
+            border-radius: 4px;
+        }
+        
+        ::-webkit-scrollbar-thumb:hover {
+            background: var(--text-muted);
+        }
+        
+        /* Empty State */
+        .empty-state {
+            text-align: center;
+            padding: 60px 20px;
+            color: var(--text-muted);
+        }
+        
+        .empty-state i {
+            font-size: 3rem;
+            margin-bottom: 16px;
+            opacity: 0.5;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <!-- Header -->
+        <div class="header">
+            <div class="header-top">
+                <h1><i class="fas fa-bolt"></i> nanoboot <span class="header-badge">Admin Console</span></h1>
+                <button id="langToggle" class="lang-btn"><i class="fas fa-globe"></i> 中文</button>
+            </div>
+            <div class="stats">
+                <div class="stat-card">
+                    <i class="fas fa-cube"></i>
+                    <div class="stat-info">
+                        <div class="number" id="beanCount">0</div>
+                        <div class="label" data-i18n="totalBeans">Total Beans</div>
+                    </div>
+                </div>
+                <div class="stat-card">
+                    <i class="fas fa-route"></i>
+                    <div class="stat-info">
+                        <div class="number" id="routeCount">0</div>
+                        <div class="label" data-i18n="totalRoutes">Total Routes</div>
+                    </div>
+                </div>
+                <div class="stat-card">
+                    <i class="fas fa-server"></i>
+                    <div class="stat-info">
+                        <div class="number" id="serverPort">--</div>
+                        <div class="label" data-i18n="port">Port</div>
+                    </div>
+                </div>
+                <div class="stat-card">
+                    <i class="fas fa-clock"></i>
+                    <div class="stat-info">
+                        <div class="number" id="serverTime">--:--</div>
+                        <div class="label" data-i18n="currentTime">Current Time</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Tabs -->
+        <div class="tabs" id="tabContainer">
+            <button class="tab-btn active" data-tab="dashboard"><i class="fas fa-th-large"></i> <span data-i18n="dashboard">Dashboard</span></button>
+            <button class="tab-btn" data-tab="beans"><i class="fas fa-cube"></i> <span data-i18n="beans">Beans</span> (<span id="beansTabCount">0</span>)</button>
+            <button class="tab-btn" data-tab="routes"><i class="fas fa-route"></i> <span data-i18n="routes">Routes</span> (<span id="routesTabCount">0</span>)</button>
+            <button class="tab-btn" data-tab="api"><i class="fas fa-paper-plane"></i> <span data-i18n="api">API Tester</span></button>
+            <button class="tab-btn" data-tab="graph"><i class="fas fa-project-diagram"></i> <span data-i18n="graph">Dependency Graph</span></button>
+            <button class="tab-btn" data-tab="config"><i class="fas fa-cog"></i> <span data-i18n="config">Config</span></button>
+        </div>
+        
+        <!-- Dashboard Tab -->
+        <div id="dashboard" class="tab-content active">
+            <h2><i class="fas fa-th-large"></i> <span data-i18n="overview">Application Overview</span></h2>
+            <div class="dashboard-grid">
+                <div class="dashboard-card" style="border-left: 4px solid var(--accent-green);">
+                    <h3><i class="fas fa-cube"></i> <span data-i18n="registeredBeans">Registered Beans</span></h3>
+                    <div class="big-number" id="dashboardBeanCount">0</div>
+                    <p data-i18n="beanDescription">Total components managed by IOC container</p>
+                </div>
+                <div class="dashboard-card" style="border-left: 4px solid var(--accent-purple);">
+                    <h3><i class="fas fa-route"></i> <span data-i18n="apiRoutes">API Routes</span></h3>
+                    <div class="big-number" id="dashboardRouteCount">0</div>
+                    <p data-i18n="routeDescription">HTTP endpoints available</p>
+                </div>
+                <div class="dashboard-card" style="border-left: 4px solid var(--accent-blue);">
+                    <h3><i class="fas fa-server"></i> <span data-i18n="serverStatus">Server Status</span></h3>
+                    <div class="big-number" style="font-size: 2rem; margin-top: 20px;">Running</div>
+                    <div class="server-status">
+                        <span class="status-dot"></span>
+                        <span data-i18n="listeningOn">Listening on port</span> <span id="dashboardPort">--</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Beans Tab -->
+        <div id="beans" class="tab-content">
+            <h2><i class="fas fa-cube"></i> <span data-i18n="beanList">Registered Beans</span></h2>
+            <table id="beansTable">
+                <thead>
+                    <tr>
+                        <th data-i18n="beanName">Bean Name</th>
+                        <th data-i18n="className">Class Name</th>
+                        <th data-i18n="dependencies">Dependencies</th>
+                    </tr>
+                </thead>
+                <tbody id="beansTableBody">
+                    <tr><td colspan="3" class="loading"><i class="fas fa-spinner"></i></td></tr>
+                </tbody>
+            </table>
+        </div>
+        
+        <!-- Routes Tab -->
+        <div id="routes" class="tab-content">
+            <h2><i class="fas fa-route"></i> <span data-i18n="routeList">API Routes</span> <button class="btn btn-sm" onclick="toggleAllRoutes()" id="toggleRoutesBtn"><i class="fas fa-eye"></i> <span data-i18n="showAll">Show All</span></button></h2>
+            <table id="routesTable">
+                <thead>
+                    <tr>
+                        <th data-i18n="method">Method</th>
+                        <th data-i18n="path">Path</th>
+                        <th data-i18n="handler">Handler</th>
+                    </tr>
+                </thead>
+                <tbody id="routesTableBody">
+                    <tr><td colspan="3" class="loading"><i class="fas fa-spinner"></i></td></tr>
+                </tbody>
+            </table>
+        </div>
+        
+        <!-- API Tester Tab -->
+        <div id="api" class="tab-content">
+            <h2><i class="fas fa-paper-plane"></i> <span data-i18n="apiTester">HTTP Request Tester</span></h2>
+            <div class="api-tester">
+                <div class="form-row">
+                    <select id="requestMethod">
+                        <option value="GET">GET</option>
+                        <option value="POST">POST</option>
+                        <option value="PUT">PUT</option>
+                        <option value="DELETE">DELETE</option>
+                        <option value="PATCH">PATCH</option>
+                    </select>
+                    <input type="text" id="requestPath" placeholder="/api/path" value="/api/example">
+                    <button class="btn btn-primary" onclick="sendRequest()">
+                        <i class="fas fa-paper-plane"></i> <span data-i18n="send">Send</span>
+                    </button>
+                </div>
+                <textarea id="requestBody" placeholder="Request Body (JSON)" data-i18n-placeholder="requestBodyPlaceholder"></textarea>
+                
+                <div class="quick-test"><i class="fas fa-bolt"></i> <span data-i18n="quickTest">Quick Test</span></div>
+                <div class="quick-test-container" id="quickTestContainer">
+                    <span style="color: var(--text-muted);" data-i18n="loadingRoutes">Loading routes...</span>
+                </div>
+                
+                <div class="response-area" id="responseArea" data-i18n="responsePlaceholder">Response will appear here...</div>
+                <div class="status-bar">
+                    <span><span class="status-dot"></span><span data-i18n="ready">Ready</span></span>
+                    <span id="responseTime"></span>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Dependency Graph Tab -->
+        <div id="graph" class="tab-content">
+            <h2><i class="fas fa-project-diagram"></i> <span data-i18n="dependencyGraph">Bean Dependency Graph</span></h2>
+            <div class="graph-container" id="graphContainer">
+                <div class="graph-info"><span id="graphBeanCount">0</span> beans</div>
+                <div class="legend">
+                    <span><span class="legend-dot"></span> Bean</span>
+                    <span><i class="fas fa-arrow-right" style="font-size: 0.8rem;"></i> Dependency</span>
+                </div>
+                <div class="loading"><i class="fas fa-spinner"></i><br><span data-i18n="loadingGraph">Loading graph...</span></div>
+            </div>
+        </div>
+        
+        <!-- Config Tab -->
+        <div id="config" class="tab-content">
+            <h2><i class="fas fa-cog"></i> <span data-i18n="configuration">Configuration</span></h2>
+            <table id="configTable">
+                <thead>
+                    <tr>
+                        <th data-i18n="key">Key</th>
+                        <th data-i18n="value">Value</th>
+                    </tr>
+                </thead>
+                <tbody id="configTableBody">
+                    <tr><td colspan="2" class="loading"><i class="fas fa-spinner"></i></td></tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+    
+    <script>
+        // Internationalization
+        const i18n = {
+            zh: {
+                dashboard: '仪表盘',
+                beans: 'Beans',
+                routes: '路由',
+                api: 'API Tester',
+                graph: '依赖图',
+                config: '配置',
+                overview: '应用概览',
+                totalBeans: 'Bean总数',
+                totalRoutes: '路由总数',
+                port: '端口',
+                currentTime: '当前时间',
+                registeredBeans: '已注册的Beans',
+                beanDescription: 'IOC容器管理的总组件数',
+                apiRoutes: 'API路由',
+                routeDescription: '可用的HTTP端点',
+                serverStatus: '服务器状态',
+                listeningOn: '监听端口',
+                beanList: 'Bean列表',
+                beanName: 'Bean名称',
+                className: '类名',
+                dependencies: '依赖',
+                routeList: '路由列表',
+                method: '方法',
+                path: '路径',
+                handler: '处理器',
+                apiTester: 'API测试器',
+                send: '发送请求',
+                requestBodyPlaceholder: '请求体 (JSON)',
+                quickTest: '快速测试',
+                loadingRoutes: '加载路由中...',
+                responsePlaceholder: '响应将显示在这里...',
+                ready: '就绪',
+                dependencyGraph: 'Bean依赖关系图',
+                loadingGraph: '加载图表中...',
+                configuration: '配置信息',
+                key: '键',
+                value: '值',
+                error: '错误',
+                clickToTest: '点击测试',
+                noRoutes: '暂无路由',
+                noBeans: '暂无Bean',
+                showAll: '显示全部',
+                hideAll: '隐藏',
+                serverInfo: '服务器信息',
+                version: '版本',
+                javaVersion: 'Java版本',
+                osName: '操作系统'
+            },
+            en: {
+                dashboard: 'Dashboard',
+                beans: 'Beans',
+                routes: 'Routes',
+                api: 'API Tester',
+                graph: 'Dependency Graph',
+                config: 'Config',
+                overview: 'Application Overview',
+                totalBeans: 'Total Beans',
+                totalRoutes: 'Total Routes',
+                port: 'Port',
+                currentTime: 'Current Time',
+                registeredBeans: 'Registered Beans',
+                beanDescription: 'Total components managed by IOC container',
+                apiRoutes: 'API Routes',
+                routeDescription: 'HTTP endpoints available',
+                serverStatus: 'Server Status',
+                listeningOn: 'Listening on port',
+                beanList: 'Bean List',
+                beanName: 'Bean Name',
+                className: 'Class Name',
+                dependencies: 'Dependencies',
+                routeList: 'Route List',
+                method: 'Method',
+                path: 'Path',
+                handler: 'Handler',
+                apiTester: 'API Tester',
+                send: 'Send',
+                requestBodyPlaceholder: 'Request Body (JSON)',
+                quickTest: 'Quick Test',
+                loadingRoutes: 'Loading routes...',
+                responsePlaceholder: 'Response will appear here...',
+                ready: 'Ready',
+                dependencyGraph: 'Dependency Graph',
+                loadingGraph: 'Loading graph...',
+                configuration: 'Configuration',
+                key: 'Key',
+                value: 'Value',
+                error: 'Error',
+                clickToTest: 'Click to test',
+                noRoutes: 'No routes',
+                noBeans: 'No beans',
+                showAll: 'Show All',
+                hideAll: 'Hide All',
+                serverInfo: 'Server Info',
+                version: 'Version',
+                javaVersion: 'Java Version',
+                osName: 'OS'
+            }
+        };
+        
+        let currentLang = localStorage.getItem('nanoboot-lang') || 'zh';
+        let appData = {
+            beanCount: 0,
+            routeCount: 0,
+            port: 0,
+            beans: [],
+            routes: [],
+            config: []
+        };
+        
+        // Initialize
+        document.addEventListener('DOMContentLoaded', async () => {
+            // Language toggle
+            document.getElementById('langToggle').addEventListener('click', toggleLanguage);
+            
+            // Tab switching
+            document.getElementById('tabContainer').addEventListener('click', (e) => {
+                const btn = e.target.closest('.tab-btn');
+                if (!btn) return;
+                const tabId = btn.getAttribute('data-tab');
+                if (!tabId) return;
+                
+                document.querySelectorAll('.tab-content').forEach(t => t.classList.remove('active'));
+                document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+                document.getElementById(tabId).classList.add('active');
+                btn.classList.add('active');
+                
+                if (tabId === 'graph') renderGraph();
+            });
+            
+            // Enter key for API request
+            document.getElementById('requestPath').addEventListener('keypress', (e) => {
+                if (e.key === 'Enter') sendRequest();
+            });
+            
+            // Fetch initial data
+            await fetchAppData();
+            updatePageText();
+            updateStats();
+            
+            // Update time every minute
+            setInterval(updateTime, 1000);
+            updateTime();
+        });
+        
+        // Toggle language
+        function toggleLanguage() {
+            currentLang = currentLang === 'zh' ? 'en' : 'zh';
+            localStorage.setItem('nanoboot-lang', currentLang);
+            updatePageText();
+        }
+        
+        // Update all text on page
+        function updatePageText() {
+            const t = i18n[currentLang];
+            
+            // Update language button
+            const langBtn = document.getElementById('langToggle');
+            langBtn.innerHTML = `<i class="fas fa-globe"></i> ${currentLang === 'zh' ? 'English' : '中文'}`;
+            
+            // Update all elements with data-i18n
+            document.querySelectorAll('[data-i18n]').forEach(el => {
+                const key = el.getAttribute('data-i18n');
+                if (t[key]) el.textContent = t[key];
+            });
+            
+            // Update placeholders
+            document.querySelectorAll('[data-i18n-placeholder]').forEach(el => {
+                const key = el.getAttribute('data-i18n-placeholder');
+                if (t[key]) el.placeholder = t[key];
+            });
+            
+            // Render dynamic content
+            renderBeansTable();
+            renderRoutesTable();
+            renderQuickTestButtons();
+            renderConfigTable();
+        }
+        
+        // Update stats
+        function updateStats() {
+            document.getElementById('beanCount').textContent = appData.beanCount;
+            document.getElementById('routeCount').textContent = appData.routeCount;
+            document.getElementById('serverPort').textContent = appData.port;
+            document.getElementById('beansTabCount').textContent = appData.beanCount;
+            document.getElementById('routesTabCount').textContent = appData.routeCount;
+            document.getElementById('dashboardBeanCount').textContent = appData.beanCount;
+            document.getElementById('dashboardRouteCount').textContent = appData.routeCount;
+            document.getElementById('dashboardPort').textContent = appData.port;
+            document.getElementById('graphBeanCount').textContent = appData.beanCount;
+        }
+        
+        // Update time
+        function updateTime() {
+            const now = new Date();
+            document.getElementById('serverTime').textContent = now.toLocaleTimeString('en-GB', { hour: '2-digit', minute: '2-digit' });
+        }
+        
+        // Fetch app data from API
+        async function fetchAppData() {
+            try {
+                const baseUrl = window.location.origin;
+                
+                // Fetch routes
+                const routesRes = await fetch(baseUrl + '/nanoboot/routes');
+                if (routesRes.ok) {
+                    const routesText = await routesRes.text();
+                    try {
+                        appData.routes = JSON.parse(routesText);
+                        appData.routeCount = appData.routes.length;
+                    } catch (e) {
+                        appData.routes = [];
+                    }
+                }
+                
+                // Fetch beans
+                const beansRes = await fetch(baseUrl + '/nanoboot/beans');
+                if (beansRes.ok) {
+                    const beansText = await beansRes.text();
+                    try {
+                        appData.beans = JSON.parse(beansText);
+                        appData.beanCount = appData.beans.length;
+                    } catch (e) {
+                        appData.beans = [];
+                    }
+                }
+                
+                // Fetch config
+                const configRes = await fetch(baseUrl + '/nanoboot/config');
+                if (configRes.ok) {
+                    const configText = await configRes.text();
+                    try {
+                        appData.config = JSON.parse(configText);
+                    } catch (e) {
+                        appData.config = [];
+                    }
+                }
+                
+                // Fetch server info (port, etc)
+                // For now, extract port from current location
+                appData.port = window.location.port || 80;
+                
+            } catch (e) {
+                console.error('Error fetching app data:', e);
+            }
+        }
+        
+        // Render beans table
+        function renderBeansTable() {
+            const tbody = document.getElementById('beansTableBody');
+            const t = i18n[currentLang];
+            
+            if (!appData.beans || appData.beans.length === 0) {
+                tbody.innerHTML = `<tr><td colspan="3" class="empty-state"><i class="fas fa-cube"></i><br>${t.noBeans}</td></tr>`;
+                return;
+            }
+            
+            let html = '';
+            appData.beans.forEach(bean => {
+                html += `<tr>
+                    <td><span class="bean-name">${bean.name}</span></td>
+                    <td>${bean.className}</td>
+                    <td>${bean.dependencies || '-'}</td>
+                </tr>`;
+            });
+            tbody.innerHTML = html;
+        }
+        
+        // Render routes table
+        function renderRoutesTable() {
+            const tbody = document.getElementById('routesTableBody');
+            const t = i18n[currentLang];
+            
+            if (!appData.routes || appData.routes.length === 0) {
+                tbody.innerHTML = `<tr><td colspan="3" class="empty-state"><i class="fas fa-route"></i><br>${t.noRoutes}</td></tr>`;
+                return;
+            }
+            
+            let html = '';
+            appData.routes.forEach((route, index) => {
+                const methodClass = route.method.toUpperCase();
+                html += `<tr class="route-row" data-method="${route.method}" data-path="${route.path}" style="cursor: pointer;${index >= 10 ? 'display:none;' : ''}" title="Click to test">
+                    <td><span class="method-badge ${methodClass}">${route.method}</span></td>
+                    <td style="font-family: 'Fira Code', monospace;">${route.path}</td>
+                    <td>${route.handler || '-'}</td>
+                </tr>`;
+            });
+            tbody.innerHTML = html;
+            
+            // Reset toggle state
+            allRoutesVisible = false;
+            const btn = document.getElementById('toggleRoutesBtn');
+            if (btn) {
+                const t = i18n[currentLang];
+                btn.innerHTML = `<i class="fas fa-eye"></i> <span>${t.showAll || 'Show All'}</span>`;
+            }
+            
+            // Add click handlers for route rows
+            tbody.querySelectorAll('.route-row').forEach(row => {
+                row.addEventListener('click', () => {
+                    const method = row.getAttribute('data-method');
+                    const path = row.getAttribute('data-path');
+                    document.getElementById('requestMethod').value = method;
+                    document.getElementById('requestPath').value = path;
+                    document.getElementById('requestPath').focus();
+                    // Switch to API tab
+                    switchTab('api');
+                });
+            });
+        }
+        
+        // Toggle all routes visibility
+        let allRoutesVisible = false;
+        function toggleAllRoutes() {
+            const tbody = document.getElementById('routesTableBody');
+            const btn = document.getElementById('toggleRoutesBtn');
+            const t = i18n[currentLang];
+            
+            allRoutesVisible = !allRoutesVisible;
+            
+            if (allRoutesVisible) {
+                // Show all rows
+                tbody.querySelectorAll('tr').forEach(row => row.style.display = '');
+                btn.innerHTML = `<i class="fas fa-eye-slash"></i> <span>${t.hideAll || 'Hide All'}</span>`;
+            } else {
+                // Hide all rows except first 10
+                const rows = tbody.querySelectorAll('tr.route-row');
+                rows.forEach((row, index) => {
+                    row.style.display = index < 10 ? '' : 'none';
+                });
+                btn.innerHTML = `<i class="fas fa-eye"></i> <span>${t.showAll || 'Show All'}</span>`;
+            }
+        }
+        
+        // Render quick test buttons
+        function renderQuickTestButtons() {
+            const container = document.getElementById('quickTestContainer');
+            const t = i18n[currentLang];
+            
+            if (!appData.routes || appData.routes.length === 0) {
+                container.innerHTML = `<span style="color: var(--text-muted);">${t.noRoutes}</span>`;
+                return;
+            }
+            
+            let html = '';
+            appData.routes.forEach(route => {
+                const methodClass = route.method.toUpperCase();
+                html += `<button class="quick-btn" data-method="${route.method}" data-path="${route.path}">
+                    <span class="method-badge ${methodClass}">${route.method}</span>
+                    <span class="path">${route.path}</span>
+                </button>`;
+            });
+            container.innerHTML = html;
+            
+            // Add click handlers
+            container.querySelectorAll('.quick-btn').forEach(btn => {
+                btn.addEventListener('click', () => {
+                    const method = btn.getAttribute('data-method');
+                    const path = btn.getAttribute('data-path');
+                    document.getElementById('requestMethod').value = method;
+                    document.getElementById('requestPath').value = path;
+                    document.getElementById('requestPath').focus();
+                });
+                btn.title = t.clickToTest;
+            });
+        }
+        
+        // Render config table
+        function renderConfigTable() {
+            const tbody = document.getElementById('configTableBody');
+            
+            if (!appData.config || appData.config.length === 0) {
+                tbody.innerHTML = `<tr><td colspan="2" class="empty-state"><i class="fas fa-cog"></i><br>No config</td></tr>`;
+                return;
+            }
+            
+            let html = '';
+            appData.config.forEach(item => {
+                html += `<tr>
+                    <td style="font-family: 'Fira Code', monospace; color: var(--accent-cyan);">${item.key}</td>
+                    <td>${item.value}</td>
+                </tr>`;
+            });
+            tbody.innerHTML = html;
+        }
+        
+        // Send request
+        async function sendRequest() {
+            const method = document.getElementById('requestMethod').value;
+            const path = document.getElementById('requestPath').value;
+            const body = document.getElementById('requestBody').value;
+            const responseArea = document.getElementById('responseArea');
+            const startTime = Date.now();
+            const t = i18n[currentLang];
+            
+            if (!path) {
+                responseArea.innerHTML = '<span style="color: var(--error);">Please enter a path</span>';
+                return;
+            }
+            
+            let url = path;
+            if (!path.startsWith('http://') && !path.startsWith('https://')) {
+                url = window.location.origin + path;
+            }
+            
+            responseArea.innerHTML = '<span style="color: var(--text-muted);">' + t.loadingRoutes + '</span>';
+            
+            try {
+                const options = {
+                    method: method,
+                    headers: { 'Content-Type': 'application/json' }
+                };
+                if (method !== 'GET' && body) options.body = body;
+                
+                const res = await fetch(url, options);
+                const text = await res.text();
+                const time = Date.now() - startTime;
+                
+                // Format JSON with syntax highlighting
+                let jsonHtml = text;
+                try {
+                    const json = JSON.parse(text);
+                    jsonHtml = syntaxHighlight(JSON.stringify(json, null, 2));
+                } catch (e) {
+                    // If not valid JSON, escape HTML
+                    jsonHtml = escapeHtml(text);
+                }
+                
+                const statusClass = res.ok ? 'ok' : 'error';
+                const statusText = res.status + ' ' + res.statusText;
+                
+                responseArea.innerHTML = 
+                    '<div class="response-header">' +
+                        '<span class="response-status ' + statusClass + '">Status: ' + statusText + '</span>' +
+                        '<span class="response-time">Time: ' + time + 'ms</span>' +
+                    '</div>' +
+                    '<pre class="response-body">' + jsonHtml + '</pre>';
+                    
+                document.getElementById('responseTime').textContent = (t.responseTime || 'Response Time') + ': ' + time + 'ms';
+            } catch (e) {
+                responseArea.innerHTML = '<span style="color: var(--error);">' + (t.error || 'Error') + ': ' + e.message + '</span>';
+            }
+        }
+        
+        // Syntax highlight JSON
+        function syntaxHighlight(json) {
+            json = escapeHtml(json);
+            return json.replace(/("(\\u[a-zA-Z0-9]{4}|\\[^u]|[^\\"])*"(\s*:)?|\b(true|false|null)\b|-?\d+(?:\.\d*)?(?:[eE][+\-]?\d+)?)/g, function (match) {
+                let cls = 'json-number';
+                if (/^"/.test(match)) {
+                    if (/:$/.test(match)) {
+                        cls = 'json-key';
+                    } else {
+                        cls = 'json-string';
+                    }
+                } else if (/true|false/.test(match)) {
+                    cls = 'json-boolean';
+                } else if (/null/.test(match)) {
+                    cls = 'json-null';
+                }
+                return '<span class="' + cls + '">' + match + '</span>';
+            });
+        }
+        
+        // Escape HTML special characters
+        function escapeHtml(text) {
+            return text
+                .replace(/&/g, "&amp;")
+                .replace(/</g, "&lt;")
+                .replace(/>/g, "&gt;")
+                .replace(/"/g, "&quot;")
+                .replace(/'/g, "&#039;");
+        }
+        
+        // Render graph
+        function renderGraph() {
+            const container = document.getElementById('graphContainer');
+            const beans = appData.beans.map(b => b.name);
+            
+            if (beans.length === 0) {
+                // Use default demo data
+                const defaultBeans = ['ApplicationContext', 'BeanFactory', 'Environment', 'BeanPostProcessor', 'Controller', 'Service', 'Repository', 'Component'];
+                renderGraphWithData(container, defaultBeans, [
+                    {from: 'ApplicationContext', to: 'BeanFactory'},
+                    {from: 'ApplicationContext', to: 'Environment'},
+                    {from: 'BeanFactory', to: 'BeanPostProcessor'},
+                    {from: 'Controller', to: 'Service'},
+                    {from: 'Service', to: 'Repository'},
+                    {from: 'Service', to: 'Component'}
+                ]);
+                return;
+            }
+            
+            // Generate dependencies from beans
+            const deps = [];
+            appData.beans.forEach(bean => {
+                if (bean.dependencies) {
+                    const depList = bean.dependencies.split(',').map(d => d.trim());
+                    depList.forEach(dep => {
+                        if (beans.includes(dep)) {
+                            deps.push({ from: bean.name, to: dep });
+                        }
+                    });
+                }
+            });
+            
+            renderGraphWithData(container, beans, deps);
+        }
+        
+        function renderGraphWithData(container, beans, deps) {
+            const width = container.clientWidth - 48;
+            const height = container.clientHeight - 80;
+            const cx = width / 2;
+            const cy = height / 2;
+            const radius = Math.min(width, height) / 2 - 80;
+            
+            if (beans.length === 0) {
+                container.innerHTML = `<div class="empty-state"><i class="fas fa-project-diagram"></i><br>No beans to display</div>`;
+                return;
+            }
+            
+            const svg = `<svg width="${width}" height="${height}" style="font-family: 'Fira Code', monospace;">
+                <defs>
+                    <marker id="arrowhead" markerWidth="10" markerHeight="7" refX="9" refY="3.5" orient="auto">
+                        <polygon points="0 0, 10 3.5, 0 7" fill="var(--accent-blue)" opacity="0.6"/>
+                    </marker>
+                </defs>
+                
+                ${deps.map(d => {
+                    const i1 = beans.indexOf(d.from);
+                    const i2 = beans.indexOf(d.to);
+                    if (i1 >= 0 && i2 >= 0) {
+                        const angle1 = (i1 / beans.length) * 2 * Math.PI - Math.PI / 2;
+                        const angle2 = (i2 / beans.length) * 2 * Math.PI - Math.PI / 2;
+                        const x1 = cx + radius * Math.cos(angle1);
+                        const y1 = cy + radius * Math.sin(angle1);
+                        const x2 = cx + radius * Math.cos(angle2);
+                        const y2 = cy + radius * Math.sin(angle2);
+                        return `<line x1="${x1}" y1="${y1}" x2="${x2}" y2="${y2}" stroke="var(--accent-blue)" stroke-width="2" marker-end="url(#arrowhead)" opacity="0.5"/>`;
+                    }
+                    return '';
+                }).join('')}
+                
+                ${beans.map((bean, i) => {
+                    const angle = (i / beans.length) * 2 * Math.PI - Math.PI / 2;
+                    const x = cx + radius * Math.cos(angle);
+                    const y = cy + radius * Math.sin(angle);
+                    const colors = ['#22C55E', '#3B82F6', '#8B5CF6', '#EC4899', '#06B6D4', '#F59E0B', '#EF4444', '#10B981'];
+                    const color = colors[i % colors.length];
+                    return `<g>
+                        <circle cx="${x}" cy="${y}" r="40" fill="${color}" opacity="0.9"/>
+                        <text x="${x}" y="${y}" fill="white" text-anchor="middle" dy="5" font-size="11" font-weight="600">${bean.length > 12 ? bean.substring(0, 10) + '..' : bean}</text>
+                    </g>`;
+                }).join('')}
+            </svg>`;
+            
+            // Keep the info and legend
+            const info = container.querySelector('.graph-info');
+            const legend = container.querySelector('.legend');
+            container.innerHTML = svg;
+            if (info) container.appendChild(info);
+            if (legend) container.appendChild(legend);
+        }
+    </script>
+</body>
+</html>

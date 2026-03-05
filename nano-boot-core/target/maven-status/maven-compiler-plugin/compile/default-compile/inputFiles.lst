@@ -3,6 +3,9 @@ D:\dai\NanoBoot\nano-boot-core\src\main\java\org\nanoboot\core\config\DefaultEnv
 D:\dai\NanoBoot\nano-boot-core\src\main\java\org\nanoboot\core\container\DefaultApplicationContext.java
 D:\dai\NanoBoot\nano-boot-core\src\main\java\org\nanoboot\core\container\BeanDefinition.java
 D:\dai\NanoBoot\nano-boot-core\src\main\java\org\nanoboot\core\ApplicationContext.java
+D:\dai\NanoBoot\nano-boot-core\src\main\java\org\nanoboot\core\InitializingBean.java
 D:\dai\NanoBoot\nano-boot-core\src\main\java\org\nanoboot\core\container\PackageScanner.java
 D:\dai\NanoBoot\nano-boot-core\src\main\java\org\nanoboot\core\Environment.java
+D:\dai\NanoBoot\nano-boot-core\src\main\java\org\nanoboot\core\BeanPostProcessor.java
+D:\dai\NanoBoot\nano-boot-core\src\main\java\org\nanoboot\core\DisposableBean.java
 D:\dai\NanoBoot\nano-boot-core\src\main\java\Annotation.java

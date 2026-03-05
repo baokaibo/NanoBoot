@@ -11,7 +11,6 @@ import demo.app.service.ApplicationService;
 import demo.app.dto.GreetingRequest;
 
 @Controller
-@RequestMapping("/api")
 public class ApplicationController {
 
     @Autowired

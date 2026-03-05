@@ -5,9 +5,14 @@ import org.nanoboot.annotation.Annotation.Component;
 import org.nanoboot.annotation.Annotation.Service;
 import org.nanoboot.annotation.Annotation.Configuration;
 import org.nanoboot.annotation.Annotation.Value;
+import org.nanoboot.annotation.Annotation.Scope;
 import org.nanoboot.core.ApplicationContext;
+import org.nanoboot.core.BeanPostProcessor;
+import org.nanoboot.core.DisposableBean;
 import org.nanoboot.core.Environment;
+import org.nanoboot.core.InitializingBean;
 
+import java.lang.reflect.Constructor;
 import java.lang.reflect.Field;
 import java.lang.reflect.Method;
 import java.util.*;
@@ -29,6 +34,9 @@ public class DefaultApplicationContext implements ApplicationContext {
 
     // 包扫描路径
     private final Set<String> basePackages = new HashSet<>();
+
+    // BeanPostProcessor 列表
+    private final List<BeanPostProcessor> beanPostProcessors = new ArrayList<>();
 
     // 环境配置
     private Environment environment;
@@ -58,10 +66,59 @@ public class DefaultApplicationContext implements ApplicationContext {
 
     @Override
     public void close() {
+        // 销毁所有单例Bean
+        destroySingletons();
+
         // 清理资源
         singletonObjects.clear();
         beanDefinitionRegistry.clear();
         basePackages.clear();
+        beanPostProcessors.clear();
+    }
+
+    /**
+     * 销毁所有单例Bean
+     */
+    private void destroySingletons() {
+        // 倒序销毁（后创建的先销毁）
+        List<String> beanNames = new ArrayList<>(singletonObjects.keySet());
+        Collections.reverse(beanNames);
+
+        for (String beanName : beanNames) {
+            Object bean = singletonObjects.get(beanName);
+            if (bean != null) {
+                destroyBean(beanName, bean);
+            }
+        }
+    }
+
+    /**
+     * 销毁单个Bean
+     */
+    private void destroyBean(String beanName, Object bean) {
+        Class<?> clazz = bean.getClass();
+
+        // 1. 调用 @PreDestroy 注解的方法
+        Method[] methods = clazz.getDeclaredMethods();
+        for (Method method : methods) {
+            if (method.isAnnotationPresent(org.nanoboot.annotation.Annotation.PreDestroy.class)) {
+                method.setAccessible(true);
+                try {
+                    method.invoke(bean);
+                } catch (Exception e) {
+                    throw new BeanDestructionException("Failed to execute @PreDestroy method: " + method.getName() + " on bean '" + beanName + "'", e);
+                }
+            }
+        }
+
+        // 2. 调用 DisposableBean.destroy()
+        if (bean instanceof DisposableBean) {
+            try {
+                ((DisposableBean) bean).destroy();
+            } catch (Exception e) {
+                throw new BeanDestructionException("Failed to invoke destroy() on bean '" + beanName + "'", e);
+            }
+        }
     }
 
     @Override
@@ -92,13 +149,19 @@ public class DefaultApplicationContext implements ApplicationContext {
 
     @Override
     public <T> T getBean(String name) {
-        if (!singletonObjects.containsKey(name)) {
-            BeanDefinition bd = beanDefinitionRegistry.get(name);
-            if (bd == null) {
-                throw new NoSuchBeanDefinitionException("No bean named '" + name + "' available");
-            }
+        BeanDefinition bd = beanDefinitionRegistry.get(name);
+        if (bd == null) {
+            throw new NoSuchBeanDefinitionException("No bean named '" + name + "' available");
+        }
 
+        // Prototype 作用域: 每次创建新实例
+        if (!bd.isSingleton()) {
             return (T) createBean(bd);
+        }
+
+        // Singleton 作用域: 使用缓存
+        if (!singletonObjects.containsKey(name)) {
+            singletonObjects.put(name, createBean(bd));
         }
         return (T) singletonObjects.get(name);
     }
@@ -140,6 +203,20 @@ public class DefaultApplicationContext implements ApplicationContext {
     }
 
     /**
+     * 获取所有 BeanPostProcessor
+     */
+    public List<BeanPostProcessor> getBeanPostProcessors() {
+        return Collections.unmodifiableList(beanPostProcessors);
+    }
+
+    /**
+     * 添加 BeanPostProcessor
+     */
+    public void addBeanPostProcessor(BeanPostProcessor beanPostProcessor) {
+        this.beanPostProcessors.add(beanPostProcessor);
+    }
+
+    /**
      * 扫描包并注册Bean定义
      */
     private void scanAndRegisterBeans() {
@@ -162,7 +239,14 @@ public class DefaultApplicationContext implements ApplicationContext {
             throw new BeanDefinitionOverrideException("Bean definition for '" + beanName + "' already registered");
         }
 
-        BeanDefinition bd = new BeanDefinition(clazz, true); // 默认单例
+        // 读取@Scope注解
+        Scope scopeAnnotation = clazz.getAnnotation(Scope.class);
+        String scope = "singleton"; // 默认单例
+        if (scopeAnnotation != null) {
+            scope = scopeAnnotation.value();
+        }
+
+        BeanDefinition bd = new BeanDefinition(clazz, scope);
         beanDefinitionRegistry.put(beanName, bd);
     }
 
@@ -206,11 +290,18 @@ public class DefaultApplicationContext implements ApplicationContext {
         try {
             Object bean = instantiateBean(bd);
             populateBean(bean, bd);
-            initializeBean(bean, bd);
+
+            // 获取 beanName（可能为 null，需要重新查找）
+            String actualBeanName = findBeanNameByType(bd.getBeanClass());
+            if (actualBeanName == null) {
+                actualBeanName = beanName;
+            }
+
+            bean = initializeBean(bean, actualBeanName);
 
             // 将单例Bean放入缓存
             if (bd.isSingleton()) {
-                singletonObjects.put(beanName, bean);
+                singletonObjects.put(actualBeanName, bean);
             }
 
             return bean;
@@ -221,12 +312,82 @@ public class DefaultApplicationContext implements ApplicationContext {
 
     /**
      * 实例化Bean
+     * 支持构造函数注入和默认无参构造
      */
     private Object instantiateBean(BeanDefinition bd) {
+        Class<?> beanClass = bd.getBeanClass();
+        
+        // 获取所有构造函数
+        Constructor<?>[] constructors = beanClass.getDeclaredConstructors();
+        
+        if (constructors.length == 0) {
+            // 没有构造函数，使用默认
         try {
-            return bd.getBeanClass().getDeclaredConstructor().newInstance();
+                return beanClass.getDeclaredConstructor().newInstance();
+            } catch (Exception e) {
+                throw new BeanInstantiationException("Failed to instantiate bean of type " + beanClass.getName(), e);
+            }
+        }
+        
+        // 尝试找到最佳匹配的构造函数
+        Constructor<?> bestConstructor = findBestConstructor(constructors);
+        
+        if (bestConstructor.getParameterCount() == 0) {
+            // 无参构造函数
+            try {
+                return bestConstructor.newInstance();
+            } catch (Exception e) {
+                throw new BeanInstantiationException("Failed to instantiate bean of type " + beanClass.getName(), e);
+            }
+        }
+        
+        // 有参构造函数 - 解析参数并注入
+        return instantiateWithConstructor(bestConstructor);
+    }
+    
+    /**
+     * 查找最佳构造函数
+     * 优先选择参数最多的构造函数（最能表达依赖关系）
+     */
+    private Constructor<?> findBestConstructor(Constructor<?>[] constructors) {
+        if (constructors.length == 1) {
+            return constructors[0];
+        }
+        
+        // 按参数数量降序排序
+        Constructor<?>[] sorted = constructors.clone();
+        Arrays.sort(sorted, (c1, c2) -> Integer.compare(c2.getParameterCount(), c1.getParameterCount()));
+        
+        // 返回参数最多的那个
+        return sorted[0];
+    }
+    
+    /**
+     * 使用构造函数参数实例化Bean
+     */
+    private Object instantiateWithConstructor(Constructor<?> constructor) {
+        Class<?>[] paramTypes = constructor.getParameterTypes();
+        Object[] args = new Object[paramTypes.length];
+        
+        for (int i = 0; i < paramTypes.length; i++) {
+            Class<?> paramType = paramTypes[i];
+            String[] beanNames = getBeanNamesForType(paramType);
+            
+            if (beanNames.length == 0) {
+                throw new BeanInstantiationException("No qualifying bean of type " + paramType.getName() + 
+                    " found for constructor parameter at index " + i);
+            }
+            
+            // 使用第一个匹配的bean
+            args[i] = getBean(beanNames[0], paramType);
+        }
+        
+        try {
+            constructor.setAccessible(true);
+            return constructor.newInstance(args);
         } catch (Exception e) {
-            throw new BeanInstantiationException("Failed to instantiate bean of type " + bd.getBeanClass().getName(), e);
+            throw new BeanInstantiationException("Failed to instantiate bean using constructor: " + 
+                constructor.toGenericString(), e);
         }
     }
 
@@ -272,10 +433,26 @@ public class DefaultApplicationContext implements ApplicationContext {
     /**
      * 初始化Bean
      */
-    private void initializeBean(Object bean, BeanDefinition bd) {
-        Class<?> clazz = bd.getBeanClass();
+    private Object initializeBean(Object bean, String beanName) {
+        // 1. BeanPostProcessor.postProcessBeforeInitialization
+        for (BeanPostProcessor bpp : beanPostProcessors) {
+            bean = bpp.postProcessBeforeInitialization(bean, beanName);
+            if (bean == null) {
+                throw new BeanInitializationException("BeanPostProcessor '" + bpp.getClass().getName() + "' returned null for bean '" + beanName + "'");
+            }
+        }
 
-        // 查找并执行@PostConstruct注解的方法
+        // 2. 调用 InitializingBean.afterPropertiesSet()
+        if (bean instanceof InitializingBean) {
+            try {
+                ((InitializingBean) bean).afterPropertiesSet();
+            } catch (Exception e) {
+                throw new BeanInitializationException("Failed to invoke afterPropertiesSet() on bean '" + beanName + "'", e);
+            }
+        }
+
+        // 3. 调用 @PostConstruct 注解的方法
+        Class<?> clazz = bean.getClass();
         Method[] methods = clazz.getDeclaredMethods();
         for (Method method : methods) {
             if (method.isAnnotationPresent(org.nanoboot.annotation.Annotation.PostConstruct.class)) {
@@ -287,6 +464,16 @@ public class DefaultApplicationContext implements ApplicationContext {
                 }
             }
         }
+
+        // 4. BeanPostProcessor.postProcessAfterInitialization
+        for (BeanPostProcessor bpp : beanPostProcessors) {
+            bean = bpp.postProcessAfterInitialization(bean, beanName);
+            if (bean == null) {
+                throw new BeanInitializationException("BeanPostProcessor '" + bpp.getClass().getName() + "' returned null for bean '" + beanName + "'");
+            }
+        }
+
+        return bean;
     }
 
     /**
@@ -396,6 +583,7 @@ public class DefaultApplicationContext implements ApplicationContext {
     }
 
     public static class BeanInstantiationException extends RuntimeException {
+        public BeanInstantiationException(String msg) { super(msg); }
         public BeanInstantiationException(String msg, Throwable cause) { super(msg, cause); }
     }
 
@@ -404,7 +592,12 @@ public class DefaultApplicationContext implements ApplicationContext {
     }
 
     public static class BeanInitializationException extends RuntimeException {
+        public BeanInitializationException(String msg) { super(msg); }
         public BeanInitializationException(String msg, Throwable cause) { super(msg, cause); }
+    }
+
+    public static class BeanDestructionException extends RuntimeException {
+        public BeanDestructionException(String msg, Throwable cause) { super(msg, cause); }
     }
 
     public static class NoSuchBeanDefinitionException extends RuntimeException {

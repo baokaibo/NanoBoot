@@ -6,12 +6,14 @@
         <sourceOutputDir name="target/generated-sources/annotations" />
         <sourceTestOutputDir name="target/generated-test-sources/test-annotations" />
         <outputRelativeToContentRoot value="true" />
-        <module name="nano-boot-web" />
         <module name="nano-boot-data" />
         <module name="nano-boot-cli" />
+        <module name="nano-boot-websocket" />
+        <module name="nano-boot-web" />
+        <module name="demo-app" />
         <module name="nano-boot-core" />
         <module name="nano-boot-starter" />
-        <module name="nano-boot-websocket" />
+        <module name="my-app" />
       </profile>
     </annotationProcessing>
   </component>

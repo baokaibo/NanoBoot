@@ -160,4 +160,14 @@ public class Annotation {
     @Retention(RetentionPolicy.RUNTIME)
     public @interface RequestBody {
     }
+
+    /**
+     * Scope annotation - defines the scope of a bean
+     * Supports: singleton, prototype, request, session
+     */
+    @Target(ElementType.TYPE)
+    @Retention(RetentionPolicy.RUNTIME)
+    public @interface Scope {
+        String value() default "singleton";
+    }
 }

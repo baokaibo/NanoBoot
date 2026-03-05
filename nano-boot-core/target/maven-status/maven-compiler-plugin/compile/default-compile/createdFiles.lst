@@ -1,5 +1,8 @@
 org\nanoboot\annotation\Annotation$RequestMethod.class
+org\nanoboot\core\container\DefaultApplicationContext$BeanDestructionException.class
+org\nanoboot\annotation\Annotation$PreDestroy.class
 org\nanoboot\annotation\Annotation$Autowired.class
+org\nanoboot\core\BeanPostProcessor.class
 org\nanoboot\core\config\DefaultEnvironment.class
 org\nanoboot\core\container\DefaultApplicationContext$NoSuchBeanDefinitionException.class
 org\nanoboot\annotation\Annotation$RequestParam.class
@@ -24,9 +27,12 @@ org\nanoboot\annotation\Annotation$Controller.class
 org\nanoboot\core\container\DefaultApplicationContext$BeanInitializationException.class
 org\nanoboot\annotation\Annotation$Value.class
 org\nanoboot\annotation\Annotation$ConfigurationProperties.class
+org\nanoboot\annotation\Annotation$Scope.class
 org\nanoboot\core\Environment.class
 org\nanoboot\core\container\DefaultApplicationContext$BeanCreationException.class
 org\nanoboot\core\container\DefaultApplicationContext$BeanDefinitionOverrideException.class
 org\nanoboot\core\container\DefaultApplicationContext$BeanNotOfRequiredTypeException.class
 org\nanoboot\annotation\Annotation$PathVariable.class
 org\nanoboot\annotation\Annotation$Component.class
+org\nanoboot\core\DisposableBean.class
+org\nanoboot\core\InitializingBean.class

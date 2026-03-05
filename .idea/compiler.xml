@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project version="4">
+  <component name="CompilerConfiguration">
+    <annotationProcessing>
+      <profile name="Maven default annotation processors profile" enabled="true">
+        <sourceOutputDir name="target/generated-sources/annotations" />
+        <sourceTestOutputDir name="target/generated-test-sources/test-annotations" />
+        <outputRelativeToContentRoot value="true" />
+        <module name="nano-boot-web" />
+        <module name="nano-boot-data" />
+        <module name="nano-boot-cli" />
+        <module name="nano-boot-core" />
+        <module name="nano-boot-starter" />
+        <module name="nano-boot-websocket" />
+      </profile>
+    </annotationProcessing>
+  </component>
+</project>

@@ -64,6 +64,14 @@ public class Annotation {
     }
 
     /**
+     * Marks a method to be called before destruction
+     */
+    @Target(ElementType.METHOD)
+    @Retention(RetentionPolicy.RUNTIME)
+    public @interface PreDestroy {
+    }
+
+    /**
      * Annotation for injecting property values
      */
     @Target(ElementType.FIELD)
@@ -109,8 +117,9 @@ public class Annotation {
 
     /**
      * Generic request mapping annotation
+     * Can be used on classes to define base path, or on methods to define specific routes
      */
-    @Target(ElementType.METHOD)
+    @Target({ElementType.TYPE, ElementType.METHOD})
     @Retention(RetentionPolicy.RUNTIME)
     public @interface RequestMapping {
         String value() default "";
